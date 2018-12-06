@@ -1,5 +1,5 @@
 from unittest import TestCase
-from engine import Document, FieldTypes, Segment
+from engine import Document, FieldTypes, Segment, Query
 
 
 class TestSegment(TestCase):
@@ -33,3 +33,14 @@ class TestSegment(TestCase):
     def test_docs_count(self):
         segment = self._get_default_segment()
         self.assertEqual(segment.docs_count(), 2)
+
+    def test_search_query(self):
+        segment = self._get_default_segment()
+
+        query = "test:case -text:more than one word con:abc"
+        q = Query(query)
+        result = segment.search_no_rank(q)
+
+        self.assertEqual(result, [0, 1])
+
+

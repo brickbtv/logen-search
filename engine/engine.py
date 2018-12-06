@@ -1,3 +1,4 @@
+import re
 from enum import Enum
 import json
 
@@ -38,6 +39,16 @@ class Document:
         return "<Document, fields {0.fields}>".format(self)
 
 
+class Query:
+    parse_regex = re.compile(r"(?P<cause>[+\-!])?(?P<field>\w+):(?P<value>[\w ]+)(?:\s|$)")
+
+    def __init__(self, query: str):
+        self.parsed_query = []
+
+        for m in Query.parse_regex.finditer(query):
+            self.parsed_query.append(m.groups())
+
+
 class Segment:
     version = 1.0
 
@@ -56,6 +67,26 @@ class Segment:
     def docs_count(self):
         return self.docs_counter
 
+    def search_no_rank(self, query: Query):
+        result = []
+
+        for subquery in query.parsed_query:
+            cause, field, value = subquery
+            if cause is None:                               # any documents with
+                if field in self._index and value in self._index[field]:
+                    result.extend(self._index[field][value])
+            elif cause == '+':                              # document MUST contains field and value
+                if field in self._index and value in self._index[field]:
+                    result = list(set(result).intersection(set(self._index[field][value])))
+                else:
+                    return []
+            elif cause == '-':                              # document MUST NOT contains field or field value
+                if field in self._index:
+                    if value in self._index[field]:
+                        result = list(set(result).difference(set(self._index[field][value])))
+
+        return result
+
     def __repr__(self):
         return "<Index Ver {0.version}, content {0._index}>".format(self)
 
@@ -70,10 +101,12 @@ if __name__ == "__main__":
     doc2 = Document()
     doc2.add_field(FieldTypes.STRING, "content", "I Lost Everything I Have before version 1.0")
 
-    index = Segment()
-    index.add_document(doc)
-    index.add_document(doc2)
+    segment = Segment()
+    segment.add_document(doc)
+    segment.add_document(doc2)
+
+    query = Query("content:Logen -content:any -content:more than one word con:abc")
 
     print(doc)
     print(doc2)
-    print(index)
+    print(segment)
