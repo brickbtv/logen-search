@@ -1,5 +1,8 @@
 from unittest import TestCase
-from engine import Document, FieldTypes, Segment, Query
+
+from logen.core.document import Document, FieldTypes
+from logen.core.query import Query
+from logen.core.segment import Segment
 
 
 class TestSegment(TestCase):
@@ -42,5 +45,3 @@ class TestSegment(TestCase):
         result = segment.search_no_rank(q)
 
         self.assertEqual(result, [0, 1])
-
-
