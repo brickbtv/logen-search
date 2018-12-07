@@ -28,11 +28,11 @@ class TestSegment(TestCase):
 
     def test_add_document(self):
         segment = self._get_default_segment()
-        self.assertEqual(segment._index, self._get_default_index())
+        self.assertEqual(segment.index, self._get_default_index())
 
     def test_docs_count(self):
         segment = self._get_default_segment()
-        self.assertEqual(segment.docs_count(), 2)
+        self.assertEqual(segment.docs_counter, 2)
 
     def test_search_query(self):
         segment = self._get_default_segment()
