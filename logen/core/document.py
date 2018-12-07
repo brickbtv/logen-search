@@ -27,6 +27,8 @@ class Document:
     def _get_value_by_type(self, type, value):
         if type == FieldTypes.STRING:
             return self._parse_string(value)
+        else:
+            return value
 
     def _parse_string(self, value: str):
         return value.split(' ')
