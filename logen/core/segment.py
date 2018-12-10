@@ -3,7 +3,6 @@ import reprlib
 from copy import deepcopy
 
 from logen.core.document import Document
-from logen.core.query import Query
 
 
 class SetEncoder(json.JSONEncoder):
@@ -56,26 +55,6 @@ class Segment:
             terms = self.__index.setdefault(field_name, {})
             for term in field_value['value']:
                 terms.setdefault(term.lower(), set()).add(doc_id)
-
-    def search_no_rank(self, query: Query):
-        result = []
-
-        for subquery in query.parsed_query:
-            cause, field, value = subquery
-            if cause is None:  # any documents with value
-                if field in self.__index and value in self.__index[field]:
-                    result.extend(self.__index[field][value])
-            elif cause == '+':  # document MUST contains field and value
-                if field in self.__index and value in self.__index[field]:
-                    result = list(set(result).intersection(set(self.__index[field][value])))
-                else:
-                    return []
-            elif cause == '-':  # document MUST NOT contains field or field value
-                if field in self.__index:
-                    if value in self.__index[field]:
-                        result = list(set(result).difference(set(self.__index[field][value])))
-
-        return result
 
     def __repr__(self):
         return "<Index Ver {0.version}, content {1}>".format(self, reprlib.repr(self.index))
