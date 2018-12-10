@@ -16,7 +16,7 @@ class SearcherNoRank(SearcherAbstract):
         self.__index = index
 
     def search(self, query: Query, results=None):
-        result = []
+        doc_ids = []
 
         segment = self.__index.get_snapshot()
 
@@ -24,18 +24,18 @@ class SearcherNoRank(SearcherAbstract):
             cause, field, value = subquery
             if cause is None:  # any documents with value
                 if field in segment and value in segment[field]:
-                    result.extend(segment[field][value])
+                    doc_ids.extend(segment[field][value])
             elif cause == '+':  # document MUST contains field and value
                 if field in segment and value in segment[field]:
-                    result = list(set(result).intersection(set(segment[field][value])))
+                    doc_ids = list(set(doc_ids).intersection(set(segment[field][value])))
                 else:
                     return []
             elif cause == '-':  # document MUST NOT contains field or field value
                 if field in segment:
                     if value in segment[field]:
-                        result = list(set(result).difference(set(segment[field][value])))
+                        doc_ids = list(set(doc_ids).difference(set(segment[field][value])))
 
-        return result
+        return [self.__index.get_key_by_doc_id(doc_id) for doc_id in doc_ids]
 
     def facet(self, query):
         pass
