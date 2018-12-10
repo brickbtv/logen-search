@@ -56,6 +56,8 @@ class Segment:
             for term in field_value['value']:
                 terms.setdefault(term.lower(), set()).add(doc_id)
 
+        return doc_id
+
     def __repr__(self):
         return "<Index Ver {0.version}, content {1}>".format(self, reprlib.repr(self.index))
 

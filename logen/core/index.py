@@ -21,7 +21,7 @@ class IndexInMemory(IndexAbstract):
         self.__segment = Segment()
 
     def add_document(self, doc: Document):
-        self.__segment.add_document(doc)
+        return self.__segment.add_document(doc)
 
     def del_document(self, doc_id):
         pass

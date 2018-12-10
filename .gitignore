@@ -4,3 +4,4 @@
 */__pycache__/*
 logen/core/venv/*
 logen/core/__pycache__/*
+logen/main.py
